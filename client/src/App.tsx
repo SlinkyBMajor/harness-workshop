@@ -1,8 +1,8 @@
 import { useState } from 'react'
 
 const initialBody = `{
-  "model": "TODO see stack.md",
-  "maxTokens": 300,
+  "model": "claude-sonnet-4-6",
+  "max_tokens": 300,
   "messages": [{ "role": "user", "content": "Say hello in one line." }]
 }`
 
