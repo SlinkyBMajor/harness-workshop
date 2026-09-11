@@ -1,4 +1,4 @@
-import { pipeline } from "@huggingface/transformers";
+/* import { pipeline } from "@huggingface/transformers";
 
 const extractor = await pipeline(
   "feature-extraction",
@@ -9,3 +9,4 @@ export async function embed(text: string): Promise<number[]> {
   const output = await extractor(text, { pooling: "mean", normalize: true });
   return Array.from(output.data as Float32Array);
 }
+ */
