@@ -25,6 +25,10 @@ export type ChatRequest = Anthropic.MessageCreateParamsNonStreaming;
 export type ChatResponse = Anthropic.Message;
 
 // This is where we call the API through the client.
+//
+// Right now we send the conversation once and return whatever comes back.
+// If the model asks for a tool, the reply has stop_reason "tool_use" and we
+// hand that straight to the client without running anything.
 export async function callClaude(params: ChatRequest): Promise<ChatResponse> {
   const messages: Anthropic.MessageParam[] = [...params.messages];
 
@@ -36,19 +40,30 @@ export async function callClaude(params: ChatRequest): Promise<ChatResponse> {
       messages,
     });
 
+    return response; // <- Remove me once you comment the block below back in
+
+    /* <- Remove me for tools
+
+    // If the current turn is not a tool_use, return the response
     if (response.stop_reason !== "tool_use") {
       return response;
     }
 
+    // Otherwise, find the tool_use blocks
     const toolUses = response.content.filter(
       (block): block is Anthropic.ToolUseBlock => block.type === "tool_use",
     );
 
+    // Call the tools and collect the results
     const toolResults = await Promise.all(toolUses.map(runTool));
 
     // Put the model's request and our answers in the conversation, then go again
     messages.push({ role: "assistant", content: response.content });
+
+    // Push the results of the tools to the conversation, so the model can see it
     messages.push({ role: "user", content: toolResults });
+
+    Remove me -> */
   }
 
   throw new Error(`Gave up after ${MAX_TOOL_ROUNDS} rounds of tool calls`);
@@ -56,7 +71,8 @@ export async function callClaude(params: ChatRequest): Promise<ChatResponse> {
 
 // Runs one tool the model asked for and wraps the outcome as a tool_result block.
 // A failing tool is reported back to the model, not thrown, so the model can recover.
-async function runTool(
+// Nothing calls this until you comment the block in callClaude back in.
+export async function runTool(
   toolUse: Anthropic.ToolUseBlock,
 ): Promise<Anthropic.ToolResultBlockParam> {
   const tool = toolsByName.get(toolUse.name);
