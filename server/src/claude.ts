@@ -36,7 +36,6 @@ export async function callClaude(params: ChatRequest): Promise<ChatResponse> {
     const response = await client.messages.create({
       ...params,
       model: MODEL,
-      tools: toolDefinitions,
       messages,
     });
 
