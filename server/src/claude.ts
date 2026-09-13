@@ -40,30 +40,7 @@ export async function callClaude(params: ChatRequest): Promise<ChatResponse> {
       messages,
     });
 
-    return response; // <- Remove me once you comment the block below back in
-
-    /* <- Remove me for tools
-
-    // If the current turn is not a tool_use, return the response
-    if (response.stop_reason !== "tool_use") {
-      return response;
-    }
-
-    // Otherwise, find the tool_use blocks
-    const toolUses = response.content.filter(
-      (block): block is Anthropic.ToolUseBlock => block.type === "tool_use",
-    );
-
-    // Call the tools and collect the results
-    const toolResults = await Promise.all(toolUses.map(runTool));
-
-    // Put the model's request and our answers in the conversation, then go again
-    messages.push({ role: "assistant", content: response.content });
-
-    // Push the results of the tools to the conversation, so the model can see it
-    messages.push({ role: "user", content: toolResults });
-
-    Remove me -> */
+    return response;
   }
 
   throw new Error(`Gave up after ${MAX_TOOL_ROUNDS} rounds of tool calls`);
