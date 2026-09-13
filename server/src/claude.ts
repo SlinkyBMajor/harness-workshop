@@ -19,7 +19,7 @@ const client = new Anthropic({
 const MODEL = "claude-sonnet-4-6";
 
 // Safety cap so a confused model can't loop forever
-const MAX_TOOL_ROUNDS = 10;
+const MAX_TOOL_ROUNDS = 3;
 
 export type ChatRequest = Anthropic.MessageCreateParamsNonStreaming;
 export type ChatResponse = Anthropic.Message;
