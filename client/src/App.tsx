@@ -149,10 +149,11 @@ export default function App() {
   }
 
   // Posts a body exactly as given and rebuilds the conversation from the wire.
-  async function submit(bodyText: string) {
+  // "pending" is what the panel shows while we wait. The reply replaces it, so
+  // a server that returns no history still collapses back to a single turn.
+  async function submit(bodyText: string, pending: ChatEntry[]) {
     setSending(true);
-    // Show the messages we are about to send, so the panel is never stale.
-    setConversation(conversationFrom(bodyText, ""));
+    setConversation(pending);
     setResponse("...");
     try {
       const { status, text: reply } = await postChat(bodyText);
@@ -179,13 +180,15 @@ export default function App() {
 
     setBody(text);
     setMessage("");
-    await submit(text);
+    // Keep the turns we were last given and add the one we are sending.
+    await submit(text, [...conversation, { role: "user", text: content }]);
   }
 
   // The editor: send the body exactly as written, messages and all.
+  // The body is a whole conversation here, so it replaces the panel.
   async function sendBody() {
     if (sending || bodyError) return;
-    await submit(body);
+    await submit(body, conversationFrom(body, ""));
   }
 
   return (
