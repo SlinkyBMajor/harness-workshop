@@ -47,7 +47,7 @@ export async function callClaude(params: ChatRequest): Promise<ChatResponse> {
 
 // Runs one tool the model asked for and wraps the outcome as a tool_result block.
 // A failing tool is reported back to the model, not thrown, so the model can recover.
-// Nothing calls this until you comment the block in callClaude back in.
+// Nothing calls this until you add the tool loop to callClaude.
 export async function runTool(
   toolUse: Anthropic.ToolUseBlock,
 ): Promise<Anthropic.ToolResultBlockParam> {
