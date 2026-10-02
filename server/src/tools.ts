@@ -1,10 +1,10 @@
-import Anthropic from "@anthropic-ai/sdk";
+import type OpenAI from "openai";
 
 // A tool has two halves:
-// - definition: what the model sees (name, description, input schema)
+// - definition: what the model sees (name, description, parameters)
 // - run: the function we call when the model asks for this tool
 export type Tool = {
-  definition: Anthropic.Tool;
+  definition: OpenAI.FunctionDefinition;
   run: (input: unknown) => Promise<string>;
 };
 
@@ -16,8 +16,12 @@ export type Tool = {
 
 export const tools: Tool[] = []; // Also add it here so it's exported
 
-// What we send to the model
-export const toolDefinitions = tools.map((t) => t.definition);
+// What we send to the model. The API wants each definition wrapped as a
+// "function" tool.
+export const toolDefinitions: OpenAI.ChatCompletionTool[] = tools.map((t) => ({
+  type: "function",
+  function: t.definition,
+}));
 
 // How we find the function to run, given the name the model answered with
 export const toolsByName = new Map(tools.map((t) => [t.definition.name, t]));

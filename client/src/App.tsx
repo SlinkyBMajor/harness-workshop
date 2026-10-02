@@ -3,7 +3,7 @@ import { useState } from "react";
 type ChatEntry = { role: string; text: string };
 
 const initialBody = `{
-  "max_tokens": 300,
+  "max_completion_tokens": 1000,
   "messages": [
     {
       "role": "user",
@@ -29,26 +29,36 @@ function prettify(status: number, text: string): string {
   }
 }
 
-// A message's content is either a plain string or a list of blocks.
+// A message's content is a plain string, a list of parts, or null.
 function contentToText(content: unknown): string {
   if (typeof content === "string") return content;
   if (Array.isArray(content)) {
-    const texts = content
-      .filter((block) => block?.type === "text")
-      .map((block) => block.text as string);
-    if (texts.length > 0) return texts.join("\n");
-    // A tool_use reply has no text block until the server runs the tool.
-    const kinds = content.map((block) => block?.type).join(", ");
-    return `(no text block, content: ${kinds || "empty"})`;
+    return content
+      .filter((part) => part?.type === "text")
+      .map((part) => part.text as string)
+      .join("\n");
   }
-  return String(content ?? "");
+  return "";
+}
+
+// A reply that asks for tools has no text until the server runs them.
+function messageToText(message: any): string {
+  const text = contentToText(message?.content);
+  if (text) return text;
+  if (Array.isArray(message?.tool_calls) && message.tool_calls.length > 0) {
+    const names = message.tool_calls
+      .map((call: any) => call?.function?.name ?? call?.type)
+      .join(", ");
+    return `(no text, tool_calls: ${names})`;
+  }
+  return "(no text)";
 }
 
 function toEntries(messages: unknown): ChatEntry[] {
   if (!Array.isArray(messages)) return [];
   return messages.map((m) => ({
     role: String(m?.role ?? "assistant"),
-    text: contentToText(m?.content),
+    text: messageToText(m),
   }));
 }
 
@@ -81,7 +91,7 @@ function conversationFrom(sentBody: string, reply: string): ChatEntry[] {
 
   return [
     ...toEntries(sent),
-    { role: "assistant", text: contentToText(parsed?.content) },
+    { role: "assistant", text: messageToText(parsed?.choices?.[0]?.message) },
   ];
 }
 
