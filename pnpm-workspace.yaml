@@ -1,9 +1,0 @@
-packages:
-  - client
-  - server
-allowBuilds:
-  esbuild: true
-  # Pulled in by @huggingface/transformers in the embeddings lesson.
-  # Their install scripts are not needed for search on the CPU.
-  onnxruntime-node: false
-  protobufjs: false
