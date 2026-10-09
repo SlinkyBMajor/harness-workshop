@@ -114,33 +114,6 @@ function withMessage(
   }
 }
 
-const panel = {
-  border: "1px solid #ddd",
-  borderRadius: 6,
-  padding: "0.75rem",
-  display: "flex",
-  flexDirection: "column",
-  gap: "0.5rem",
-  minHeight: 0,
-} as const;
-
-const panelTitle = {
-  fontSize: 13,
-  fontWeight: 700,
-  textTransform: "uppercase",
-  letterSpacing: "0.05em",
-  color: "#666",
-} as const;
-
-const hint = { fontSize: 13, color: "#888", margin: 0 } as const;
-
-const mono = {
-  fontFamily: "monospace",
-  fontSize: 13,
-  padding: "0.5rem",
-  margin: 0,
-} as const;
-
 export default function App() {
   const [body, setBody] = useState(initialBody);
   const [message, setMessage] = useState("");
@@ -202,93 +175,54 @@ export default function App() {
   }
 
   return (
-    <main
-      style={{
-        height: "100vh",
-        boxSizing: "border-box",
-        maxWidth: 1280,
-        margin: "0 auto",
-        padding: "1rem",
-        fontFamily: "sans-serif",
-        display: "flex",
-        flexDirection: "column",
-        gap: "0.75rem",
-      }}
-    >
-      <h1 style={{ fontSize: 20, margin: 0 }}>Chat playground</h1>
+    <main className="app">
+      <header className="app-head">
+        <p className="eyebrow">Build a harness - Basics</p>
+        <h1>Chat playground</h1>
+      </header>
 
-      <div
-        style={{
-          flex: 1,
-          minHeight: 0,
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))",
-          gap: "1rem",
-        }}
-      >
+      <div className="columns">
         {/* Left: what a user of the app sees. */}
-        <section style={{ ...panel, gap: "0.75rem" }}>
-          <span style={panelTitle}>Conversation</span>
+        <section className="panel">
+          <span className="panel-title">Conversation</span>
 
-          <div
-            style={{
-              flex: 1,
-              minHeight: 0,
-              overflowY: "auto",
-              display: "flex",
-              flexDirection: "column",
-              gap: "0.5rem",
-            }}
-          >
+          <div className="messages">
             {conversation.length === 0 && (
-              <p style={hint}>
-                Chat history is empty.
-              </p>
+              <p className="hint">Chat history is empty.</p>
             )}
             {conversation.map((entry, i) => (
-              <div
-                key={i}
-                style={{
-                  alignSelf: entry.role === "user" ? "flex-end" : "flex-start",
-                  maxWidth: "85%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: 8,
-                  background: entry.role === "user" ? "#dbeafe" : "#f4f4f4",
-                  whiteSpace: "pre-wrap",
-                  overflowWrap: "anywhere",
-                }}
-              >
+              <div key={i} className={`message ${entry.role}`}>
+                <span className="who">{entry.role}</span>
                 {entry.text}
               </div>
             ))}
-            {sending && <span style={{ color: "#888" }}>...</span>}
+            {sending && <span className="pending">...</span>}
           </div>
 
           <form
+            className="chat-form"
             onSubmit={(e) => {
               e.preventDefault();
               sendChat();
             }}
-            style={{ display: "flex", gap: "0.5rem" }}
           >
             <input
               value={message}
               onChange={(e) => changeMessage(e.target.value)}
               placeholder="Type a message and press Enter"
               disabled={sending}
-              style={{ flex: 1, minWidth: 0, padding: "0.5rem", fontSize: 15 }}
             />
             <button
               type="submit"
+              className="btn"
               disabled={sending || !message.trim()}
-              style={{ padding: "0.5rem 0.9rem", fontSize: 15 }}
             >
               Send
             </button>
             <button
               type="button"
+              className="btn ghost"
               onClick={() => setConversation([])}
-              style={{ padding: "0.5rem 0.9rem", fontSize: 15 }}
             >
               Clear
             </button>
@@ -296,60 +230,34 @@ export default function App() {
         </section>
 
         {/* Right: what actually goes over the wire. */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateRows: "1fr 1fr",
-            gap: "1rem",
-            minHeight: 0,
-          }}
-        >
-          <section style={panel}>
-            <span style={panelTitle}>Request body &rarr; /api/chat</span>
-            <p style={hint}>
-              The raw body we send to our server.
-            </p>
+        <div className="stack">
+          <section className="panel">
+            <span className="panel-title">
+              Request body <span className="route">&rarr; /api/chat</span>
+            </span>
+            <p className="hint">The raw body we send to our server.</p>
             <textarea
+              className={bodyError ? "code-input invalid" : "code-input"}
               value={body}
               onChange={(e) => setBody(e.target.value)}
               spellCheck={false}
-              style={{
-                ...mono,
-                flex: 1,
-                minHeight: 0,
-                resize: "none",
-                boxSizing: "border-box",
-                border: bodyError ? "1px solid #c00" : "1px solid #ccc",
-                borderRadius: 4,
-              }}
             />
-            {bodyError && (
-              <span style={{ color: "#c00", fontSize: 13 }}>{bodyError}</span>
-            )}
+            {bodyError && <span className="error">{bodyError}</span>}
             <button
               type="button"
+              className="btn ghost"
               onClick={sendBody}
               disabled={sending || Boolean(bodyError)}
-              style={{ padding: "0.5rem 0.9rem", fontSize: 15 }}
             >
               Send as message
             </button>
           </section>
 
-          <section style={panel}>
-            <span style={panelTitle}>Raw response &larr; /api/chat</span>
-            <pre
-              style={{
-                ...mono,
-                flex: 1,
-                minHeight: 0,
-                overflow: "auto",
-                background: "#f4f4f4",
-                borderRadius: 4,
-                whiteSpace: "pre-wrap",
-                overflowWrap: "anywhere",
-              }}
-            >
+          <section className="panel">
+            <span className="panel-title">
+              Raw response <span className="route">&larr; /api/chat</span>
+            </span>
+            <pre className={response ? "code-output" : "code-output empty"}>
               {response || "Nothing sent yet."}
             </pre>
           </section>

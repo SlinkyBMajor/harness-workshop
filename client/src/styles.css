@@ -1,0 +1,280 @@
+/* Same palette and fonts as the tech lunch deck: near-black ground, warm off-white text, one blue. */
+:root {
+  --paper: rgb(20, 20, 19);
+  --surface: #1c1c1b;
+  --surface-2: #262625;
+  --ink: rgb(232, 230, 220);
+  --muted: #a1a19b;
+  --line: rgba(255, 255, 255, 0.1);
+  --primary: #e8e6dc;
+  --on-primary: #171716;
+  --accent: oklch(70.7% 0.165 254.624); /* the model */
+  --tool: #f0a35c; /* the harness and its tools */
+  --error: #f87171;
+  --code-bg: #0f0f0e;
+  --font-body: "Geist", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+.app {
+  height: 100vh;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.app-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+
+.columns {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 24px;
+}
+
+.stack {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 24px;
+}
+
+.panel {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+}
+
+.panel-title {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.panel-title .route {
+  color: var(--accent);
+  text-transform: none;
+}
+
+.hint {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* Conversation */
+.messages {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.message {
+  max-width: 85%;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 15px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  align-self: flex-start;
+  background: var(--surface-2);
+  animation: in 240ms ease-out both;
+}
+
+.message .who {
+  display: block;
+  margin-bottom: 4px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.message.user {
+  align-self: flex-end;
+}
+
+.message.assistant {
+  background: oklch(70.7% 0.165 254.624 / 0.1);
+}
+
+.message.assistant .who {
+  color: var(--accent);
+}
+
+.message.tool {
+  background: rgba(240, 163, 92, 0.09);
+}
+
+.message.tool .who {
+  color: var(--tool);
+}
+
+.pending {
+  font-family: var(--font-mono);
+  color: var(--muted);
+}
+
+@keyframes in {
+  from {
+    opacity: 0.2;
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .message {
+    animation: none;
+  }
+}
+
+.chat-form {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 14px;
+  font-size: 15px;
+  background: var(--surface-2);
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+}
+
+.chat-form input:focus,
+.code-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Buttons: a white pill for the main action, an outlined one for the rest */
+.btn {
+  padding: 9px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 999px;
+  border: 1.5px solid var(--primary);
+  background: var(--primary);
+  color: var(--on-primary);
+  cursor: pointer;
+}
+
+.btn.ghost {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+.btn.ghost:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.panel > .btn {
+  align-self: flex-start;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--tool);
+  outline-offset: 2px;
+}
+
+/* Request body and raw response */
+.code-input,
+.code-output {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding: 14px 16px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.5;
+  background: var(--code-bg);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.code-input {
+  resize: none;
+}
+
+.code-input.invalid {
+  border-color: var(--error);
+}
+
+.code-output {
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.code-output.empty {
+  color: var(--muted);
+}
+
+.error {
+  font-size: 13px;
+  color: var(--error);
+}
